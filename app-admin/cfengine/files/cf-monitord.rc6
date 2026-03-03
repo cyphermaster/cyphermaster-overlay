@@ -1,0 +1,13 @@
+#!/sbin/openrc-run
+
+description="CFEngine monitor daemon"
+
+command="/usr/sbin/cf-monitord"
+command_args="${EXTRA_OPTS}"
+pidfile="/var/cfengine/cf-monitord.pid"
+command_background="no"
+
+depend() {
+    need net
+    use dns logger
+}

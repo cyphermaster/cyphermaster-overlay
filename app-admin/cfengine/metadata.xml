@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>github@nanard.org</email>
+		<name>nanard</name>
+	</maintainer>
+	<use>
+		<flag name="masterfiles">Install the Masterfiles Policy Framework</flag>
+    <flag name="mysql">Enable MySQL database support</flag>
+    <flag name="pam">Enable PAM authentication support</flag>
+    <flag name="xml">Enable XML support via libxml2</flag>
+    <flag name="selinux">Enable SELinux integration</flag>
+	</use>
+	<upstream>
+    <remote-id type="github">cfengine/core</remote-id>
+	</upstream>
+  <description>
+  Scalable configuration management system based on convergence and Promise Theory
+  </description>
+  <longdescription>
+  CFEngine is a configuration management system built around the principle of
+  convergence, ensuring that systems automatically move toward and maintain a
+  defined desired state through repeatable corrective actions.
+
+  Convergence combines the specification of a desired end-state with corrective
+  operators that remain stable once equilibrium is reached, providing predictable
+  and deterministic infrastructure behavior.
+
+  Its architecture is based on Promise Theory: components declare voluntary
+  promises about their intended behavior rather than being centrally commanded.
+  This decentralized model enables scalable coordination, fault tolerance, and
+  emergent stability in distributed systems. Policies describe promises, and the
+  CFEngine agent continuously evaluates and enforces them to maintain integrity
+  and consistency.
+
+  Designed for autonomy, scalability, and minimal resource usage, CFEngine
+  provides deterministic policy enforcement suitable for infrastructures ranging
+  from single nodes to large distributed environments.
+  </longdescription>
+</pkgmetadata>
