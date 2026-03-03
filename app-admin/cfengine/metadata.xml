@@ -6,11 +6,11 @@
 		<name>nanard</name>
 	</maintainer>
 	<use>
-		<flag name="masterfiles">Install the Masterfiles Policy Framework</flag>
     <flag name="mysql">Enable MySQL database support</flag>
     <flag name="pam">Enable PAM authentication support</flag>
     <flag name="xml">Enable XML support via libxml2</flag>
     <flag name="selinux">Enable SELinux integration</flag>
+    <flag name="yaml">Enable YAML via libyaml</flag>
 	</use>
 	<upstream>
     <remote-id type="github">cfengine/core</remote-id>

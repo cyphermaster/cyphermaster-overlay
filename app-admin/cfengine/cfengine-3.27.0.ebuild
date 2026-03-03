@@ -6,15 +6,13 @@ inherit autotools
 
 DESCRIPTION="Autonomous configuration management system implementing Promise Theory"
 HOMEPAGE="https://cfengine.org"
-SRC_URI="https://github.com/cfengine/core/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
 
-SRC_URI="https://cfengine-package-repos.s3.amazonaws.com/tarballs/${PN}-community-${PV}.tar.gz
-	masterfiles? ( https://cfengine-package-repos.s3.amazonaws.com/tarballs/${PN}-masterfiles-${PV}.tar.gz )"
+SRC_URI="https://cfengine-package-repos.s3.amazonaws.com/tarballs/${PN}-community-${PV}.tar.gz"
 LICENSE="GPL-3"
-SLOT="3.27"
+SLOT="3"
 KEYWORDS="~amd64"
 
-IUSE="acl mysql pam selinux xml curl masterfiles examples"
+IUSE="acl mysql pam selinux xml curl examples yaml"
 
 BDEPEND="virtual/pkgconfig"
 
@@ -23,7 +21,7 @@ DEPEND="
 	curl? ( net-misc/curl )
     dev-libs/openssl:=
     dev-libs/libpcre2:=
-    dev-libs/libyaml
+	yaml? ( dev-libs/libyaml )
     net-libs/librsync
     dev-libs/icu
     acl? ( virtual/acl )
@@ -35,7 +33,7 @@ DEPEND="
 
 
 RDEPEND="${DEPEND}"
-#S="${WORKDIR}/${PN}-community-${PV}"
+S="${WORKDIR}/${P}"
 
 src_prepare() {
     default
@@ -44,14 +42,9 @@ src_prepare() {
 src_unpack() {
 	unpack ${PN}-community-${PV}.tar.gz
 
-	if use masterfiles; then
-		unpack ${PN}-masterfiles-${PV}.tar.gz
-	fi
 }
 
 src_configure() {
-	# Enforce /var/cfengine for historical compatibility
-
 	econf \
 		--enable-fhs \
 		--docdir=/usr/share/doc/${PF} \
@@ -63,12 +56,18 @@ src_configure() {
         $(use_with xml libxml2) \
         $(use_enable selinux) \
 		$(use_with curl)
-
 }
 
 src_install() {
 	default
 	keepdir /var/cfengine
+	keepdir /var/cfengine/inputs
+	keepdir /var/cfengine/modules
+	keepdir /var/cfengine/outputs
+	keepdir /var/cfengine/plugins
+	keepdir /var/cfengine/ppkeys
+	keepdir /var/cfengine/state
+
     fperms 700 /var/cfengine
 	newinitd "${FILESDIR}"/cf-serverd.rc6 cf-serverd
 	newinitd "${FILESDIR}"/cf-monitord.rc6 cf-monitord
@@ -80,22 +79,12 @@ src_install() {
 		rm -rf "${ED}"/usr/share/doc/${PF}/example*
 	fi
 
-	# Create cfengine working directory
 	dodir /var/cfengine/bin
-	fperms 700 /var/cfengine
 
-	# Copy cfagent into the cfengine tree otherwise cfexecd won't
-	# find it. Most hosts cache their copy of the cfengine
-	# binaries here. This is the default search location for the
-	# binaries.
+	# /var/cfengine/ used in many places internally
 	for bin in promises agent monitord serverd execd runagent key; do
 		dosym ../../../usr/sbin/cf-$bin /var/cfengine/bin/cf-$bin
 	done
-
-	if use masterfiles; then
-		insinto /var/cfengine
-		doins -r "${WORKDIR}/masterfiles"
-	fi
 
 	dodir /etc/env.d
 	echo 'CONFIG_PROTECT=/var/cfengine/masterfiles' >"${ED}/etc/env.d/99${PN}" || die
