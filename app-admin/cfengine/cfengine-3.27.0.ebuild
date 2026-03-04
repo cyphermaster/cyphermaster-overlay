@@ -10,7 +10,7 @@ HOMEPAGE="https://cfengine.org"
 SRC_URI="https://cfengine-package-repos.s3.amazonaws.com/tarballs/${PN}-community-${PV}.tar.gz"
 LICENSE="GPL-3"
 SLOT="3"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 
 IUSE="acl mysql pam selinux xml curl examples yaml"
 
@@ -28,7 +28,7 @@ DEPEND="
     pam? ( sys-libs/pam )
     xml? ( dev-libs/libxml2 )
     selinux? ( sys-libs/libselinux )
-	mysql? ( virtual/mysql )
+	mysql? ( dev-db/mysql-connector-c )
 "
 
 
@@ -50,7 +50,7 @@ src_configure() {
 		--docdir=/usr/share/doc/${PF} \
 		--with-workdir=/var/cfengine \
 		--with-pcre2 \
-	 	$(use_with acl libacl) \
+		$(use_with acl libacl) \
         $(use_with mysql) \
         $(use_with pam) \
         $(use_with xml libxml2) \
@@ -68,7 +68,7 @@ src_install() {
 	keepdir /var/cfengine/ppkeys
 	keepdir /var/cfengine/state
 
-    fperms 700 /var/cfengine
+    fperms -R 700 /var/cfengine
 	newinitd "${FILESDIR}"/cf-serverd.rc6 cf-serverd
 	newinitd "${FILESDIR}"/cf-monitord.rc6 cf-monitord
 	newinitd "${FILESDIR}"/cf-execd.rc6 cf-execd
@@ -107,7 +107,7 @@ pkg_config() {
 	if [[ -z ${ROOT} ]]; then
 		if [ ! -f "/var/cfengine/ppkeys/localhost.priv" ]; then
 			einfo "Generating keys for localhost."
-			/usr/sbin/cf-key
+			/var/cfengine/bin/cf-key
 		fi
 	else
 		die "cfengine cfkey does not support any value of ROOT other than /."

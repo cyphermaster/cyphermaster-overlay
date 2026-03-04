@@ -1,0 +1,10 @@
+--- a/setup.py	2026-03-14 09:57:55.000000000 +0100
++++ b/setup.py	2026-06-05 14:24:09.552274523 +0200
+@@ -48,7 +48,7 @@
+     DIST = ""
+
+ VERSION = AppInfo.VERSION.replace('-', '.')
+-NAGSTAMON_SCRIPT = 'nagstamon.py'
++NAGSTAMON_SCRIPT = 'nagstamon'
+
+ from setuptools import setup
