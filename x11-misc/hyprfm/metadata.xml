@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>github@nanard.org</email>
+		<name>Bernard Brandl</name>
+	</maintainer>
+	<use>
+		<flag name="kde">Use <pkg>kde-frameworks/kwindowsystem</pkg> for window blur and background contrast</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">soyeb-jim285/hyprfm</remote-id>
+		<bugs-to>https://github.com/soyeb-jim285/hyprfm/issues</bugs-to>
+	</upstream>
+</pkgmetadata>
