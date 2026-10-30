@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>github@nanard.org</email>
+		<name>Bernard Brandl</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">PlakarKorp/plakar</remote-id>
+		<bugs-to>https://github.com/PlakarKorp/plakar/issues</bugs-to>
+		<doc>https://plakar.io/docs/</doc>
+	</upstream>
+</pkgmetadata>
