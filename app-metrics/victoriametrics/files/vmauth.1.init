@@ -1,0 +1,50 @@
+#!/sbin/openrc-run
+# shellcheck shell=sh
+
+name="vmauth daemon"
+description="VictoriaMetrics authentication proxy and load balancer"
+
+: "${VMAUTH_BIN:=/opt/victoriametrics/bin/vmauth}"
+: "${VMAUTH_USER:=victoria-metrics}"
+: "${VMAUTH_GROUP:=victoria-metrics}"
+: "${VMAUTH_CONFIG:=/etc/victoria-metrics/vmauth.yml}"
+: "${VMAUTH_LISTEN:=:8427}"
+: "${VMAUTH_LOGFILE:=/var/log/vmauth.log}"
+: "${VMAUTH_NOFILE:=65536}"
+
+command="${VMAUTH_BIN}"
+command_args="
+	-auth.config=${VMAUTH_CONFIG}
+	-httpListenAddr=${VMAUTH_LISTEN}
+	${VMAUTH_OPTS}"
+command_user="${VMAUTH_USER}:${VMAUTH_GROUP}"
+command_background="yes"
+
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="${VMAUTH_LOGFILE}"
+error_log="${VMAUTH_LOGFILE}"
+rc_ulimit="-n ${VMAUTH_NOFILE}"
+stopsig="SIGINT"
+retry="SIGINT/30/SIGTERM/10/SIGKILL/5"
+
+extra_started_commands="reload"
+
+depend() {
+	need localmount
+	use net
+	after victoriametrics
+}
+
+start_pre() {
+	[ -x "${VMAUTH_BIN}" ] || { eerror "${VMAUTH_BIN} introuvable ou non exécutable"; return 1; }
+	[ -r "${VMAUTH_CONFIG}" ] || { eerror "${VMAUTH_CONFIG} introuvable"; return 1; }
+
+	checkpath -f -m 0640 -o "${VMAUTH_USER}:${VMAUTH_GROUP}" "${VMAUTH_LOGFILE}" || return 1
+	return 0
+}
+
+reload() {
+	ebegin "Reloading ${RC_SVCNAME} configuration"
+	start-stop-daemon --signal SIGHUP --pidfile "${pidfile}"
+	eend $?
+}

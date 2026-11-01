@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>github@nanard.org</email>
+	</maintainer>
+	<use>
+		<flag name="server">Install the single-node victoria-metrics time series database</flag>
+		<flag name="backup">Install vmbackup and vmrestore snapshot backup tools</flag>
+		<flag name="vmagent">Install vmagent, the metrics scraping and relaying agent</flag>
+		<flag name="vmalert">Install vmalert alerting/recording rules engine and vmalert-tool</flag>
+		<flag name="vmauth">Install vmauth, the authenticating proxy and load balancer</flag>
+		<flag name="vmctl">Install vmctl, the data migration tool</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">VictoriaMetrics/VictoriaMetrics</remote-id>
+		<bugs-to>https://github.com/VictoriaMetrics/VictoriaMetrics/issues</bugs-to>
+		<doc>https://docs.victoriametrics.com/</doc>
+	</upstream>
+</pkgmetadata>

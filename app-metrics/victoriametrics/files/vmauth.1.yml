@@ -1,0 +1,13 @@
+# vmauth configuration
+# https://docs.victoriametrics.com/victoriametrics/vmauth/
+#
+# Passwords are stored in clear text: keep this file readable only by
+# root and the victoria-metrics group.
+users:
+  - username: "change-me"
+    password: "change-me"
+    url_prefix: "http://127.0.0.1:8428/"
+
+# Requests without credentials
+#unauthorized_user:
+#  url_prefix: "http://127.0.0.1:8428/"

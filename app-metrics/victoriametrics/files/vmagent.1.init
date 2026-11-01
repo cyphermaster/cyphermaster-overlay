@@ -1,0 +1,55 @@
+#!/sbin/openrc-run
+# shellcheck shell=sh
+
+name="vmagent daemon"
+description="VictoriaMetrics metrics collection agent"
+
+: "${VMAGENT_BIN:=/opt/victoriametrics/bin/vmagent}"
+: "${VMAGENT_USER:=victoria-metrics}"
+: "${VMAGENT_GROUP:=victoria-metrics}"
+: "${VMAGENT_CONFIG:=/etc/victoria-metrics/vmagent.yml}"
+: "${VMAGENT_REMOTE_WRITE:=http://127.0.0.1:8428/api/v1/write}"
+: "${VMAGENT_DATA:=/var/lib/victoria-metrics/vmagent-remotewrite-data}"
+: "${VMAGENT_LISTEN:=:8429}"
+: "${VMAGENT_LOGFILE:=/var/log/vmagent.log}"
+: "${VMAGENT_NOFILE:=65536}"
+
+command="${VMAGENT_BIN}"
+command_args="
+	-promscrape.config=${VMAGENT_CONFIG}
+	-remoteWrite.url=${VMAGENT_REMOTE_WRITE}
+	-remoteWrite.tmpDataPath=${VMAGENT_DATA}
+	-httpListenAddr=${VMAGENT_LISTEN}
+	${VMAGENT_OPTS}"
+command_user="${VMAGENT_USER}:${VMAGENT_GROUP}"
+command_background="yes"
+
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="${VMAGENT_LOGFILE}"
+error_log="${VMAGENT_LOGFILE}"
+rc_ulimit="-n ${VMAGENT_NOFILE}"
+stopsig="SIGINT"
+retry="SIGINT/30/SIGTERM/10/SIGKILL/5"
+
+extra_started_commands="reload"
+
+depend() {
+	need localmount
+	use net
+	after victoriametrics
+}
+
+start_pre() {
+	[ -x "${VMAGENT_BIN}" ] || { eerror "${VMAGENT_BIN} introuvable ou non exécutable"; return 1; }
+	[ -r "${VMAGENT_CONFIG}" ] || { eerror "${VMAGENT_CONFIG} introuvable"; return 1; }
+
+	checkpath -d -m 0750 -o "${VMAGENT_USER}:${VMAGENT_GROUP}" "${VMAGENT_DATA}" || return 1
+	checkpath -f -m 0640 -o "${VMAGENT_USER}:${VMAGENT_GROUP}" "${VMAGENT_LOGFILE}" || return 1
+	return 0
+}
+
+reload() {
+	ebegin "Reloading ${RC_SVCNAME} configuration"
+	start-stop-daemon --signal SIGHUP --pidfile "${pidfile}"
+	eend $?
+}
