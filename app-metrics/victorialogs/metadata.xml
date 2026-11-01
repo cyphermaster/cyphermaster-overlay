@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>github@nanard.org</email>
+	</maintainer>
+	<use>
+		<flag name="server">Install the victoria-logs log database</flag>
+		<flag name="vlagent">Install vlagent, the log collection and relaying agent</flag>
+		<flag name="vlogscli">Install vlogscli, the interactive LogsQL query client</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">VictoriaMetrics/VictoriaLogs</remote-id>
+		<bugs-to>https://github.com/VictoriaMetrics/VictoriaLogs/issues</bugs-to>
+		<doc>https://docs.victoriametrics.com/victorialogs/</doc>
+	</upstream>
+</pkgmetadata>

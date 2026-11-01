@@ -1,0 +1,46 @@
+#!/sbin/openrc-run
+# shellcheck shell=sh
+
+name="vlagent daemon"
+description="VictoriaLogs log collection and relaying agent"
+
+: "${VLAGENT_BIN:=/opt/victorialogs/bin/vlagent}"
+: "${VLAGENT_USER:=victoria-logs}"
+: "${VLAGENT_GROUP:=victoria-logs}"
+: "${VLAGENT_REMOTE_WRITE:=http://127.0.0.1:9428/insert/native}"
+: "${VLAGENT_DATA:=/var/lib/victoria-logs/vlagent-data}"
+: "${VLAGENT_LISTEN:=:9429}"
+: "${VLAGENT_LOGFILE:=/var/log/vlagent.log}"
+: "${VLAGENT_NOFILE:=65536}"
+
+command="${VLAGENT_BIN}"
+# quotes: the glob must reach vlagent unexpanded
+command_args="
+	-remoteWrite.url=${VLAGENT_REMOTE_WRITE}
+	-tmpDataPath=${VLAGENT_DATA}
+	-httpListenAddr=${VLAGENT_LISTEN}
+	${VLAGENT_FILES:+-fileCollector.glob='${VLAGENT_FILES}'}
+	${VLAGENT_OPTS}"
+command_user="${VLAGENT_USER}:${VLAGENT_GROUP}"
+command_background="yes"
+
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="${VLAGENT_LOGFILE}"
+error_log="${VLAGENT_LOGFILE}"
+rc_ulimit="-n ${VLAGENT_NOFILE}"
+stopsig="SIGINT"
+retry="SIGINT/30/SIGTERM/10/SIGKILL/5"
+
+depend() {
+	need localmount
+	use net
+	after victorialogs
+}
+
+start_pre() {
+	[ -x "${VLAGENT_BIN}" ] || { eerror "${VLAGENT_BIN} introuvable ou non exécutable"; return 1; }
+
+	checkpath -d -m 0750 -o "${VLAGENT_USER}:${VLAGENT_GROUP}" "${VLAGENT_DATA}" || return 1
+	checkpath -f -m 0640 -o "${VLAGENT_USER}:${VLAGENT_GROUP}" "${VLAGENT_LOGFILE}" || return 1
+	return 0
+}

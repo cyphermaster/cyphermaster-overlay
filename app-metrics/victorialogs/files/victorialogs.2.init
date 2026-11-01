@@ -1,0 +1,54 @@
+#!/sbin/openrc-run
+# shellcheck shell=sh
+
+name="victorialogs daemon"
+description="VictoriaLogs log database (syslog unix socket ingestion)"
+
+: "${VL_BIN:=/opt/victorialogs/bin/victoria-logs}"
+: "${VL_USER:=victoria-logs}"
+: "${VL_GROUP:=victoria-logs}"
+: "${VL_DATA:=/var/lib/victoria-logs/data}"
+: "${VL_RETENTION:=30d}"
+: "${VL_SOCKET:=/run/victoria-logs/victoria-logs.sock}"
+: "${VL_STREAM_FIELDS:=[\"hostname\",\"app_name\"]}"
+: "${VL_LOGFILE:=/var/log/victoria-logs.log}"
+: "${VL_NOFILE:=65536}"
+
+command="${VL_BIN}"
+command_args="
+	-storageDataPath=${VL_DATA}
+	-retentionPeriod=${VL_RETENTION}
+	-syslog.listenAddr.unix=${VL_SOCKET}
+	-syslog.streamFields.unix='${VL_STREAM_FIELDS}'
+	${VL_OPTS}"
+command_user="${VL_USER}:${VL_GROUP}"
+# group-writable syslog socket; override in conf.d if needed
+: "${start_stop_daemon_args:=--umask 0002}"
+command_background="yes"
+
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="${VL_LOGFILE}"
+error_log="${VL_LOGFILE}"
+rc_ulimit="-n ${VL_NOFILE}"
+stopsig="SIGINT"
+retry="SIGINT/30/SIGTERM/10/SIGKILL/5"
+
+depend() {
+	need localmount
+}
+
+start_pre() {
+	[ -x "${VL_BIN}" ] || { eerror "${VL_BIN} introuvable ou non exécutable"; return 1; }
+
+	checkpath -d -m 0750 -o "${VL_USER}:${VL_GROUP}" "${VL_DATA}" || return 1
+	checkpath -d -m 0755 -o "${VL_USER}:${VL_GROUP}" "${VL_SOCKET%/*}" || return 1
+	checkpath -f -m 0640 -o "${VL_USER}:${VL_GROUP}" "${VL_LOGFILE}" || return 1
+	# il se relance pas si la socket est restée collée après un crash
+	[ -S "${VL_SOCKET}" ] && rm -f "${VL_SOCKET}"
+	return 0
+}
+
+stop_post() {
+	[ -S "${VL_SOCKET}" ] && rm -f "${VL_SOCKET}"
+	return 0
+}

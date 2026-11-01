@@ -1,0 +1,43 @@
+#!/sbin/openrc-run
+# shellcheck shell=sh
+
+name="victoriametrics daemon"
+description="VictoriaMetrics time series database"
+
+: "${VM_BIN:=/opt/victoriametrics/bin/victoria-metrics}"
+: "${VM_USER:=victoria-metrics}"
+: "${VM_GROUP:=victoria-metrics}"
+: "${VM_DATA:=/var/lib/victoria-metrics/data}"
+: "${VM_RETENTION:=1}"
+: "${VM_LISTEN:=:8428}"
+: "${VM_LOGFILE:=/var/log/victoriametrics.log}"
+: "${VM_NOFILE:=65536}"
+
+command="${VM_BIN}"
+command_args="
+	-storageDataPath=${VM_DATA}
+	-retentionPeriod=${VM_RETENTION}
+	-httpListenAddr=${VM_LISTEN}
+	${VM_OPTS}"
+command_user="${VM_USER}:${VM_GROUP}"
+command_background="yes"
+
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="${VM_LOGFILE}"
+error_log="${VM_LOGFILE}"
+rc_ulimit="-n ${VM_NOFILE}"
+stopsig="SIGINT"
+retry="SIGINT/30/SIGTERM/10/SIGKILL/5"
+
+depend() {
+	need localmount
+	use net
+}
+
+start_pre() {
+	[ -x "${VM_BIN}" ] || { eerror "${VM_BIN} introuvable ou non exécutable"; return 1; }
+
+	checkpath -d -m 0750 -o "${VM_USER}:${VM_GROUP}" "${VM_DATA}" || return 1
+	checkpath -f -m 0640 -o "${VM_USER}:${VM_GROUP}" "${VM_LOGFILE}" || return 1
+	return 0
+}
