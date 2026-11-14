@@ -3,12 +3,12 @@
 
 EAPI=8
 
-inherit cmake optfeature virtualx xdg
+inherit cmake optfeature systemd virtualx xdg
 
 # Commits of the src/qml/Quill and src/qml/icons submodules at this tag:
 #   git ls-tree v${PV} src/qml/Quill src/qml/icons
-QUILL_COMMIT="bc13deae669a1333a0d7bdd991c7015270a16a38"
-QUILL_ICONS_COMMIT="10db5facf6a560e60d2693ccd1909267ef436002"
+QUILL_COMMIT="1fe3afd493838b9799ee056a7367cfd5cdc185fd"
+QUILL_ICONS_COMMIT="69b653672ece8652cfef52c1c228abe9e2c4fce0"
 
 DESCRIPTION="A lightweight Qt6/QML file manager for Hyprland"
 HOMEPAGE="https://github.com/soyeb-jim285/hyprfm"
@@ -45,7 +45,6 @@ DEPEND="
 RDEPEND="
 	${DEPEND}
 	dev-qt/qtwayland:6
-	gnome-base/gvfs
 	x11-misc/xdg-utils
 "
 BDEPEND="
@@ -78,6 +77,8 @@ src_configure() {
 		# precompiled QML; the on-disk tree is only a fallback
 		-DHYPRFM_ENABLE_QML_CACHEGEN=ON
 		$(cmake_use_find_package kde KF6WindowSystem)
+		# libghostty-vt is fetched by FetchContent and built with zig 0.17
+		-DHYPRFM_TERMINAL=OFF
 	)
 
 	cmake_src_configure
@@ -85,6 +86,15 @@ src_configure() {
 
 src_test() {
 	virtx cmake_src_test
+}
+
+src_install() {
+	cmake_src_install
+
+	# upstream installs the portal user unit under /usr/share/systemd/user
+	local unit=xdg-desktop-portal-hyprfm.service
+	systemd_douserunit "${ED}/usr/share/systemd/user/${unit}"
+	rm -r "${ED}/usr/share/systemd" || die
 }
 
 pkg_postinst() {
@@ -98,12 +108,15 @@ pkg_postinst() {
 	optfeature "PDF thumbnails, previews and metadata" "app-text/poppler[utils]"
 	optfeature "EXIF metadata for images" media-libs/exiftool
 	optfeature "mounting devices from the sidebar" sys-fs/udisks:2
+	optfeature "SFTP, SMB and MTP browsing" gnome-base/gvfs
 	optfeature "SMB/CIFS remote browsing" "gnome-base/gvfs[samba]"
 	optfeature "Android phones (MTP) in the sidebar" "gnome-base/gvfs[mtp]"
 	optfeature "cloud storage mounts" net-misc/rclone
 	optfeature "git status in file views" dev-vcs/git
 	optfeature "7z archives" app-arch/7zip
 	optfeature "more archive formats (bsdtar)" app-arch/libarchive
-	optfeature "zip archives" app-arch/unzip
+	optfeature "zip archive creation" app-arch/zip
+	optfeature "zip archive extraction" app-arch/unzip
 	optfeature "zstd archives" app-arch/zstd
+	optfeature "native file chooser (opt-in via portals.conf)" sys-apps/xdg-desktop-portal
 }
