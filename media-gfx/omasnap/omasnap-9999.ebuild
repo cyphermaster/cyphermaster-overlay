@@ -53,7 +53,10 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
-		-DBUILD_TESTING=$(usex test)
+		# version is otherwise guessed from git or the source dir name
+		-DOMASNAP_VERSION=${PV}
+		# keep the clang-tidy lint out of the test suite
+		-DRUN_CLANG_TIDY=NO
 	)
 
 	cmake_src_configure
@@ -72,7 +75,7 @@ src_install() {
 	dodoc "${ED}"/usr/share/licenses/${PN}/*
 	rm -r "${ED}"/usr/share/licenses || die
 
-	dodoc CHANGELOG.md README.md
+	dodoc README.md
 }
 
 pkg_postinst() {
