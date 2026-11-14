@@ -1,0 +1,50 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="CFEngine execution scheduler"
+
+# start-stop-daemon unless /etc/conf.d/cf-execd sets supervisor="supervise-daemon"
+command="/var/cfengine/bin/cf-execd"
+# The daemon always stays in the foreground; the supervisor backgrounds it
+command_args="--no-fork ${EXTRA_OPTS}"
+
+case "${supervisor}" in
+	supervise-daemon)
+		respawn_delay="${respawn_delay:-10}"
+		;;
+	*)
+		command_background="yes"
+		# Not the daemon's own /var/cfengine pidfile, which it removes on exit
+		pidfile="/run/${RC_SVCNAME}.pid"
+		;;
+esac
+
+extra_started_commands="reload"
+description_reload="Reload the policy (SIGHUP)"
+
+depend() {
+	need net
+	use dns logger
+}
+
+start_pre() {
+	if [ ! -f /var/cfengine/inputs/promises.cf ]; then
+		eerror "/var/cfengine/inputs/promises.cf not found"
+		eerror "Bootstrap the host first: cf-agent --bootstrap <policy server>"
+		return 1
+	fi
+}
+
+reload() {
+	ebegin "Reloading ${RC_SVCNAME}"
+	case "${supervisor}" in
+		supervise-daemon)
+			supervise-daemon "${RC_SVCNAME}" --signal HUP
+			;;
+		*)
+			start-stop-daemon --signal HUP --pidfile "${pidfile}"
+			;;
+	esac
+	eend $?
+}

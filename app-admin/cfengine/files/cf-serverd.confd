@@ -1,0 +1,10 @@
+# /etc/conf.d/cf-serverd
+
+# Service supervisor: unset for start-stop-daemon (no respawn), or
+# supervise-daemon (respawns the daemon after respawn_delay seconds).
+#supervisor="supervise-daemon"
+#respawn_delay=10
+
+# Extra options passed to cf-serverd (--no-fork is always set).
+# See cf-serverd --help.
+#EXTRA_OPTS="--inform"
