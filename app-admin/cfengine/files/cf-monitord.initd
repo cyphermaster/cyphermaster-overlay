@@ -1,0 +1,32 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="CFEngine monitor daemon"
+
+# start-stop-daemon unless /etc/conf.d/cf-monitord sets supervisor="supervise-daemon"
+command="/var/cfengine/bin/cf-monitord"
+# The daemon always stays in the foreground; the supervisor backgrounds it
+command_args="--no-fork ${EXTRA_OPTS}"
+
+case "${supervisor}" in
+	supervise-daemon)
+		respawn_delay="${respawn_delay:-10}"
+		;;
+	*)
+		command_background="yes"
+		# Not the daemon's own /var/cfengine pidfile, which it removes on exit
+		pidfile="/run/${RC_SVCNAME}.pid"
+		;;
+esac
+depend() {
+	use net dns logger
+}
+
+start_pre() {
+	if [ ! -f /var/cfengine/inputs/promises.cf ]; then
+		eerror "/var/cfengine/inputs/promises.cf not found"
+		eerror "Bootstrap the host first: cf-agent --bootstrap <policy server>"
+		return 1
+	fi
+}
