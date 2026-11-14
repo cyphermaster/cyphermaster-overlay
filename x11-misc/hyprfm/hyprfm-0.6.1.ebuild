@@ -26,7 +26,7 @@ else
 		https://github.com/soyeb-jim285/quill-icons/archive/${QUILL_ICONS_COMMIT}.tar.gz
 			-> quill-icons-${QUILL_ICONS_COMMIT}.tar.gz
 	"
-	KEYWORDS="~amd64 ~arm64"
+	KEYWORDS="amd64 arm64"
 fi
 
 # hyprfm, quill, toml++ (bundled header): MIT; quill-icons (Lucide): ISC
