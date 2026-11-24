@@ -1,9 +1,18 @@
 # cyphermaster-overlay
 
-Personal Gentoo ebuild repository: desktop tools for Hyprland, observability stack,
-configuration management, backups and a few out-of-tree kernel modules.
+## Contents
 
-All ebuilds are EAPI 8 and ship OpenRC init scripts where a daemon is involved.
+- [Installation](#installation)
+- [Packages](#packages)
+  - [acct-group](#acct-group)
+  - [acct-user](#acct-user)
+  - [app-admin](#app-admin)
+  - [app-backup](#app-backup)
+  - [app-metrics](#app-metrics)
+  - [media-gfx](#media-gfx)
+  - [sys-power](#sys-power)
+  - [x11-misc](#x11-misc)
+- [License](#license)
 
 ## Installation
 
@@ -25,23 +34,60 @@ sync-uri = https://github.com/cyphermaster/overlay.git
 
 ## Packages
 
-| Package | Versions | Description | Upstream |
-|---|---|---|---|
-| [`app-admin/cfengine`](app-admin/cfengine) | 3.27.0-r1, ~3.27.3 | Autonomous configuration management implementing Promise Theory (`USE=fhs` for an FHS layout) | [cfengine.org](https://cfengine.org) |
-| [`app-backup/plakar`](app-backup/plakar) | ~1.1.8 | Backup tool with deduplication, encryption and a built-in snapshot browser | [plakar.io](https://plakar.io) · [GitHub](https://github.com/PlakarKorp/plakar) |
-| [`app-metrics/victorialogs`](app-metrics/victorialogs) | 1.52.1-r1 | Log database, with `vlagent` | [victoriametrics.com](https://victoriametrics.com/products/victorialogs/) · [GitHub](https://github.com/VictoriaMetrics/VictoriaLogs) |
-| [`app-metrics/victoriametrics`](app-metrics/victoriametrics) | 1.148.1 | Time series database, with `vmagent`, `vmalert` and `vmauth` | [victoriametrics.com](https://victoriametrics.com/) · [GitHub](https://github.com/VictoriaMetrics/VictoriaMetrics) |
-| [`media-gfx/omasnap`](media-gfx/omasnap) | ~1.26.3, 9999 | Native Wayland screenshot and annotation overlay for Hyprland | [GitHub](https://github.com/omacom/omasnap) |
-| [`sys-power/it5570-fan`](sys-power/it5570-fan) | ~9999 | hwmon driver for the ITE IT5570E embedded controller (fans, temperatures) | [GitHub](https://github.com/passiveEndeavour/it5570-fan) |
-| [`sys-power/it87`](sys-power/it87) | 9999 | Out-of-tree IT87 sensors module (frankcrawford fork) | [GitHub](https://github.com/frankcrawford/it87) |
-| [`x11-misc/hyprfm`](x11-misc/hyprfm) | 0.6.1, ~0.7.0, ~0.7.1, 9999 | Lightweight Qt6/QML file manager for Hyprland | [GitHub](https://github.com/soyeb-jim285/hyprfm) |
+Versions prefixed with `~` are keyworded for testing (`~amd64`). `9999` are
+live ebuilds built from upstream git.
 
-Versions prefixed with `~` are keyworded `~amd64` (testing); `9999` are live
-ebuilds built from upstream git and need an explicit `**` keyword.
+### acct-group
 
-Support packages: `acct-group/victoria-{logs,metrics}` and
-`acct-user/victoria-{logs,metrics}` provide the system accounts for the
-VictoriaMetrics daemons.
+- [**victoria-logs**](acct-group/victoria-logs) — System group for `app-metrics/victorialogs`
+- [**victoria-metrics**](acct-group/victoria-metrics) — System group for `app-metrics/victoriametrics`
+
+### acct-user
+
+- [**victoria-logs**](acct-user/victoria-logs) — System user for `app-metrics/victorialogs`
+- [**victoria-metrics**](acct-user/victoria-metrics) — System user for `app-metrics/victoriametrics`
+
+### app-admin
+
+- [**cfengine**](app-admin/cfengine) — Autonomous configuration management implementing Promise Theory; `USE=fhs` for an FHS layout
+  - Versions: 3.27.0-r1, ~3.27.3
+  - Upstream: <https://cfengine.org>
+
+### app-backup
+
+- [**plakar**](app-backup/plakar) — Backup tool with deduplication, encryption and a built-in snapshot browser
+  - Versions: ~1.1.8
+  - Upstream: <https://plakar.io>, <https://github.com/PlakarKorp/plakar>
+
+### app-metrics
+
+- [**victorialogs**](app-metrics/victorialogs) — Log database, with `vlagent`
+  - Versions: 1.52.1-r1
+  - Upstream: <https://victoriametrics.com/products/victorialogs/>, <https://github.com/VictoriaMetrics/VictoriaLogs>
+- [**victoriametrics**](app-metrics/victoriametrics) — Time series database, with `vmagent`, `vmalert` and `vmauth`
+  - Versions: 1.148.1
+  - Upstream: <https://victoriametrics.com/>, <https://github.com/VictoriaMetrics/VictoriaMetrics>
+
+### media-gfx
+
+- [**omasnap**](media-gfx/omasnap) — Native Wayland screenshot and annotation overlay for Hyprland
+  - Versions: ~1.26.3, 9999
+  - Upstream: <https://github.com/omacom/omasnap>
+
+### sys-power
+
+- [**it5570-fan**](sys-power/it5570-fan) — hwmon driver for the ITE IT5570E embedded controller (fans, temperatures)
+  - Versions: ~9999
+  - Upstream: <https://github.com/passiveEndeavour/it5570-fan>
+- [**it87**](sys-power/it87) — Out-of-tree IT87 sensors module (frankcrawford fork)
+  - Versions: 9999
+  - Upstream: <https://github.com/frankcrawford/it87>
+
+### x11-misc
+
+- [**hyprfm**](x11-misc/hyprfm) — Lightweight Qt6/QML file manager for Hyprland
+  - Versions: 0.6.1, ~0.7.0, ~0.7.1, 9999
+  - Upstream: <https://github.com/soyeb-jim285/hyprfm>
 
 ## License
 
